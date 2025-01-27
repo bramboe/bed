@@ -16,6 +16,7 @@ import { reverie } from 'Reverie/reverie';
 import { richmat } from 'Richmat/richmat';
 import { sleeptracker } from 'Sleeptracker/sleeptracker';
 import { solace } from 'Solace/solace';
+import { octo } from 'Octo/octo';
 
 const processExit = (exitCode?: number) => {
   if (exitCode && exitCode > 0) {

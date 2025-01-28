@@ -5,12 +5,17 @@ import { IController } from 'Common/IController';
 import { stringToBytes } from './stringToBytes';
 import { arrayEquals } from '@utils/arrayEquals';
 import { Cancelable } from 'Common/Cancelable';
+import { ICache } from 'Common/ICache';
 
 interface MotorState {
   head?: boolean;
   feet?: boolean;
   pillow?: boolean;
   lumbar?: boolean;
+}
+
+interface Cache {
+  motorState?: MotorState & Cancelable;
 }
 
 const move = (motorState: MotorState) => {
@@ -32,12 +37,12 @@ const move = (motorState: MotorState) => {
 
 export const setupMotorEntities = (
   mqtt: IMQTTConnection,
-  { cache, deviceData, writeCommand, cancelCommands }: IController<number[]>
+  { cache, deviceData, writeCommand, cancelCommands }: IController<number[]> & ICache<Cache>
 ) => {
   if (!cache.motorState) cache.motorState = {};
 
   const buildCoverCommand = (motor: keyof MotorState) => async (command: string) => {
-    const motorState = cache.motorState as MotorState & Cancelable;
+    const motorState = cache.motorState!;
     const originalCommand = move(motorState);
     motorState[motor] = command === 'OPEN' ? true : command === 'CLOSE' ? false : undefined;
     const newCommand = move(motorState);

@@ -1,37 +1,31 @@
 import { Cover } from '@ha/Cover';
 import { IMQTTConnection } from '@mqtt/IMQTTConnection';
 import { arrayEquals } from '@utils/arrayEquals';
-import { StringsKey } from '@utils/getString';
 import { buildEntityConfig } from 'Common/buildEntityConfig';
-import { IController } from 'Common/IController';
-import { Commands } from './Commands';
-import { Cancelable } from 'Common/Cancelable';
 import { ICache } from 'Common/ICache';
+import { IController } from 'Common/IController';
+import { ComplexCommand } from './CommandBuilder';
+import { Cancelable } from 'Common/Cancelable';
 
 interface MotorState {
   command?: number[];
 }
 
-interface Cache {
+export interface Cache {
   motorState?: MotorState & Cancelable;
 }
 
-const buildCommand = (name: StringsKey, up: number[], down: number[]) => ({ name, up, down });
-
-export const setupMotorEntities = (
+export const setupCoverEntities = (
   mqtt: IMQTTConnection,
-  { cache, deviceData, writeCommand, cancelCommands }: IController<number[]> & ICache<Cache>
+  { cache, deviceData, writeCommand, cancelCommands }: IController<number[]> & ICache<Cache>,
+  complexCommands: ComplexCommand[]
 ) => {
   if (!cache.motorState) cache.motorState = {};
 
-  const commands = [
-    buildCommand('MotorBack', Commands.MotorBackUp, Commands.MotorBackDown),
-    buildCommand('MotorLegs', Commands.MotorLegsUp, Commands.MotorLegsDown),
-    buildCommand('MotorLift', Commands.MotorLiftUp, Commands.MotorLiftDown),
-    buildCommand('MotorTilt', Commands.MotorTiltUp, Commands.MotorTiltDown),
-  ];
-
-  for (const { name, up, down } of commands) {
+  for (const {
+    name,
+    commands: { up, down },
+  } of complexCommands) {
     const coverCommand = async (command: string) => {
       const motorState = cache.motorState!;
       const originalCommand = motorState.command || [];
@@ -44,11 +38,11 @@ export const setupMotorEntities = (
       motorState.canceled = false;
 
       if (newCommand.length) {
-        await writeCommand(newCommand, 1, 5_000);
+        await writeCommand(newCommand, 50, 100);
         if (motorState.canceled) return;
         cache.motorState = {};
       }
-      await writeCommand(Commands.MotorStop);
+      await writeCommand([0x24, 0x62], 5, 100);
     };
     new Cover(mqtt, deviceData, buildEntityConfig(name), coverCommand).setOnline();
   }

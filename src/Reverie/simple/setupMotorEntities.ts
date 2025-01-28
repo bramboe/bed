@@ -4,7 +4,6 @@ import { Commands } from './Commands';
 import { arrayEquals } from '@utils/arrayEquals';
 import { Cancelable } from 'Common/Cancelable';
 import { PositionalCover } from '@ha/PositionalCover';
-import { IEventSource } from 'Common/IEventSource';
 import { IController } from 'Common/IController';
 import { ICache } from '../../Common/ICache';
 
@@ -15,13 +14,11 @@ interface MotorState {
 
 interface Cache {
   motorState?: MotorState & Cancelable;
-  headMotor?: PositionalCover;
-  feetMotor?: PositionalCover;
 }
 
 export const setupMotorEntities = (
   mqtt: IMQTTConnection,
-  { cache, deviceData, writeCommand, cancelCommands, on }: IController<number[]> & IEventSource & ICache<Cache>
+  { cache, deviceData, writeCommand, cancelCommands }: IController<number[]> & ICache<Cache>
 ) => {
   if (!cache.motorState) cache.motorState = {};
 
@@ -62,12 +59,4 @@ export const setupMotorEntities = (
       { onStop: () => writeCommand(Commands.MotorStop) }
     ).setOnline();
   }
-
-  const { headMotor, feetMotor } = cache;
-
-  on('notify', (bytes) => {
-    if (bytes.length !== 9) return;
-    headMotor.setPosition(bytes[2]);
-    feetMotor.setPosition(bytes[3]);
-  });
 };

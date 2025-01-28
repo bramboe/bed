@@ -6,15 +6,20 @@ import { IController } from 'Common/IController';
 import { Commands } from './Commands';
 import { notEmpty } from '@utils/notEmpty';
 import { Features, HasFeature } from './Features';
+import { Cancelable } from 'Common/Cancelable';
+import { ICache } from 'Common/ICache';
 
 interface MotorState {
   command?: number;
-  canceled?: boolean;
+}
+
+interface Cache {
+  motorState?: MotorState & Cancelable;
 }
 
 export const setupMotorEntities = (
   mqtt: IMQTTConnection,
-  { cache, deviceData, writeCommand, cancelCommands }: IController<number>,
+  { cache, deviceData, writeCommand, cancelCommands }: IController<number> & ICache<Cache>,
   hasFeature: HasFeature
 ) => {
   if (!cache.motorState) cache.motorState = {};
@@ -31,7 +36,7 @@ export const setupMotorEntities = (
 
   for (const { name, up, down } of commands) {
     const coverCommand = async (command: string) => {
-      const motorState = cache.motorState as MotorState;
+      const motorState = cache.motorState!;
       const originalCommand = motorState.command;
       motorState.command = command === 'OPEN' ? up : command === 'CLOSE' ? down : undefined;
       const newCommand = motorState.command;

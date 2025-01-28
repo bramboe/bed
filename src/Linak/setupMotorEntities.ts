@@ -5,6 +5,7 @@ import { buildEntityConfig } from 'Common/buildEntityConfig';
 import { Commands } from './Commands';
 import { arrayEquals } from '@utils/arrayEquals';
 import { Cancelable } from 'Common/Cancelable';
+import { ICache } from 'Common/ICache';
 
 interface MotorState {
   head?: boolean;
@@ -13,15 +14,19 @@ interface MotorState {
   feet?: boolean;
 }
 
+interface Cache {
+  motorState?: MotorState & Cancelable;
+}
+
 export const setupMotorEntities = (
   mqtt: IMQTTConnection,
-  { cache, deviceData, writeCommand, cancelCommands }: BLEController<number[]>,
+  { cache, deviceData, writeCommand, cancelCommands }: BLEController<number[]> & ICache<Cache>,
   motorCount: number
 ) => {
   if (!cache.motorState) cache.motorState = {};
 
   const buildCoverCommand = (motor: keyof MotorState | 'all') => async (command: string) => {
-    const motorState = cache.motorState as MotorState & Cancelable;
+    const motorState = cache.motorState!;
     const originalCommand = Commands.Move(motorState);
     const commandBool = command === 'OPEN' ? true : command === 'CLOSE' ? false : undefined;
     if (motor === 'all') motorState.head = motorState.back = motorState.legs = motorState.feet = commandBool;

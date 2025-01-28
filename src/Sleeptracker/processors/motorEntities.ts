@@ -12,7 +12,7 @@ interface MotorState {
   command?: Commands;
 }
 
-interface MotorCache {
+interface Cache {
   motorState?: MotorState;
 }
 
@@ -32,7 +32,7 @@ export const setupMotorEntities = async (
     },
   }: Controller
 ) => {
-  const cache = entities as MotorCache;
+  const cache = entities as Cache;
 
   if (cache.motorState) return;
 
@@ -46,7 +46,7 @@ export const setupMotorEntities = async (
 
   for (const { name, up, down, stop } of commands) {
     const coverCommand = async (command: string) => {
-      const motorState = cache.motorState as MotorState;
+      const motorState = cache.motorState!;
       const originalCommand = motorState.command || [];
       motorState.command = command === 'OPEN' ? up : command === 'CLOSE' ? down : stop;
       const newCommand = motorState.command;

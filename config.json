@@ -115,11 +115,32 @@
     "mqtt_password": "password",
     "type": "list(sleeptracker|ergowifi|richmat|linak|solace|motosleep|reverie|leggettplatt|logicdata|ergomotion|okimat|keeson)",
     "sleeptrackerRefreshFrequency": "int(0,)",
+    "sleeptrackerCredentials": [
+      {
+        "email": "email",
+        "password": "password",
+        "type": "list(tempur|beautyrest|serta)?"
+      }
+    ],
     "ergoWifiCredentials": [
       {
         "email": "email",
         "password": "password",
         "remoteStyle": "list(L|M|H)?"
+      }
+    ],
+    "ergoMotionDevices": [
+      {
+        "friendlyName": "str",
+        "ipAddress": "str",
+        "remoteStyle": "list(L|M|H)?"
+      }
+    ],
+    "logicdataDevices": [
+      {
+        "name": "str",
+        "friendlyName": "str",
+        "ipAddress": "str?"
       }
     ],
     "bleProxies": [
@@ -129,6 +150,60 @@
         "password": "password?",
         "encryptionKey": "match(^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)$)?",
         "expectedServerName": "str?"
+      }
+    ],
+    "richmatDevices": [
+      {
+        "name": "str",
+        "friendlyName": "str",
+        "remoteCode": "str",
+        "stayConnected": "bool?"
+      }
+    ],
+    "linakDevices": [
+      {
+        "name": "str",
+        "friendlyName": "str",
+        "hasMassage": "bool?",
+        "motorCount": "int?"
+      }
+    ],
+    "solaceDevices": [
+      {
+        "name": "str",
+        "friendlyName": "str"
+      }
+    ],
+    "motoSleepDevices": [
+      {
+        "name": "str",
+        "friendlyName": "str",
+        "stayConnected": "bool?"
+      }
+    ],
+    "reverieDevices": [
+      {
+        "name": "str",
+        "friendlyName": "str"
+      }
+    ],
+    "leggettPlattDevices": [
+      {
+        "name": "str",
+        "friendlyName": "str"
+      }
+    ],
+    "okimatDevices": [
+      {
+        "name": "str",
+        "friendlyName": "str",
+        "remoteCode": "str"
+      }
+    ],
+    "keesonDevices": [
+      {
+        "name": "str",
+        "friendlyName": "str"
       }
     ],
     "octoDevices": [

@@ -2,6 +2,7 @@ import { readFileSync } from 'fs';
 
 export type Type =
   | 'sleeptracker'
+  | 'octo'
   | 'ergomotion'
   | 'ergowifi'
   | 'richmat'
@@ -12,8 +13,7 @@ export type Type =
   | 'leggettplatt'
   | 'logicdata'
   | 'okimat'
-  | 'keeson'
-  | 'octo';
+  | 'keeson';
 
 interface OptionsJson {
   type: Type;

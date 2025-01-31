@@ -28,7 +28,7 @@ export const richmat = async (mqtt: IMQTTConnection, esphome: IESPConnection) =>
   if (deviceNames.length !== devices.length) return logError('[Richmat] Duplicate name detected in configuration');
   const bleDevices = await esphome.getBLEDevices(deviceNames);
   for (const bleDevice of bleDevices) {
-    const { name, mac, address, connect, getServices, disconnect } = bleDevice;
+    const { name, mac, address, connect, disconnect } = bleDevice;
 
     const controllerBuilder = checks
       .map((check, index) => (check(bleDevice) ? controllerBuilders[index] : undefined))
@@ -44,19 +44,22 @@ export const richmat = async (mqtt: IMQTTConnection, esphome: IESPConnection) =>
     }
 
     const { remoteCode, ...device } = devicesMap[mac] || devicesMap[name];
+
+    const features = remoteFeatures[remoteCode];
+    if (!features) {
+      logWarn('[Richmat] Remote code not supported, please contact me on Discord', remoteCode);
+      continue;
+    }
+
     const deviceData = buildMQTTDeviceData({ ...device, address }, 'Richmat');
     await connect();
 
-    const services = await getServices();
-    if (!device.stayConnected) await disconnect();
-
-    const controller = controllerBuilder(deviceData, bleDevice, services);
+    const controller = await controllerBuilder(deviceData, bleDevice);
     if (!controller) {
       if (device.stayConnected) await disconnect();
       continue;
     }
 
-    const features = remoteFeatures[remoteCode];
     const hasFeature = (feature: Features) => (features & feature) === feature;
 
     logInfo('[Richmat] Setting up entities for device:', name);

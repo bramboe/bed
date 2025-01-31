@@ -56,12 +56,13 @@ export const richmat = async (mqtt: IMQTTConnection, esphome: IESPConnection) =>
 
     const controller = await controllerBuilder(deviceData, bleDevice);
     if (!controller) {
-      if (device.stayConnected) await disconnect();
+      await disconnect();
       continue;
     }
 
-    const hasFeature = (feature: Features) => (features & feature) === feature;
+    if (!device.stayConnected) await disconnect();
 
+    const hasFeature = (feature: Features) => (features & feature) === feature;
     logInfo('[Richmat] Setting up entities for device:', name);
     setupPresetButtons(mqtt, controller, hasFeature);
     setupMassageButtons(mqtt, controller, hasFeature);

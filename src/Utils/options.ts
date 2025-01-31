@@ -1,19 +1,7 @@
 import { readFileSync } from 'fs';
 
 export type Type =
-  | 'sleeptracker'
-  | 'octo'
-  | 'ergomotion'
-  | 'ergowifi'
-  | 'richmat'
-  | 'linak'
-  | 'solace'
-  | 'motosleep'
-  | 'reverie'
-  | 'leggettplatt'
-  | 'logicdata'
-  | 'okimat'
-  | 'keeson';
+  | 'octo';
 
 interface OptionsJson {
   type: Type;
